@@ -66,13 +66,13 @@ def dumbbell_test():
     h4_ip = h4.IP() # Receiver #2
 
     sub_processes = dict()
-    sub_processes[h3] = h3.popen('iperf3 -s -p 1111') # Start server on Receiver #1
-    sub_processes[h4] = h4.popen('iperf3 -s -p 2222') # Start server on Receiver #2
+    sub_processes[h3] = h3.popen('iperf -s -p 1111') # Start server on Receiver #1
+    sub_processes[h4] = h4.popen('iperf -s -p 2222') # Start server on Receiver #2
 
     # Start client on Source #1
-    sub_processes[h1] = h1.popen('iperf3 -c {0} -p 1111 -i 1 -M 1460 -N -t 15 > iperf_test_h1-h3_15s.txt'.format(h3_ip), shell=True)
+    sub_processes[h1] = h1.popen('iperf -c {0} -p 1111 -i 1 -M 1460 -N -t 15 > iperf_test_h1-h3_15s.txt'.format(h3_ip), shell=True)
     # Start client on Source #2
-    sub_processes[h2] = h1.popen('iperf3 -c {0} -p 2222 -i 1 -M 1460 -N -t 15 > iperf_test_h2-h4_15s.txt'.format(h4_ip), shell=True)
+    sub_processes[h2] = h2.popen('iperf -c {0} -p 2222 -i 1 -M 1460 -N -t 15 > iperf_test_h2-h4_15s.txt'.format(h4_ip), shell=True)
 
     sub_processes[h1].wait() # Wait for Source #1 to stop sending
     sub_processes[h2].wait() # Wait for Source #2 to stop sending
