@@ -1,5 +1,6 @@
 import argparse
-from time import sleep, mktime
+#from time import sleep, mktime
+import time
 import subprocess
 import csv
 from datetime import datetime
@@ -9,6 +10,10 @@ from mininet.link import TCLink
 from mininet.util import dumpNodeConnections, quietRun
 from mininet.log import info, lg, setLogLevel
 from mininet.cli import CLI
+
+import os
+import signal
+
 
 class DumbbellTopo(Topo):
     def build(self, delay=2):
@@ -48,7 +53,34 @@ class DumbbellTopo(Topo):
         self.addLink(s4, h4, cls=TCLink, **hi_params) # Receiver #2 <-> Access Router #2
 
 
+def iperf3_command_builder(ip_address, port, interval, mtu, length_time_seconds, file_path, file_output_name) -> str:
+    ''' Example: iperf3 --forceflush -c {0} -p 1111 -i 0.5 -M 1460 -N -t 20 > iperf_test_h1-h3_15s.txt
+        All arguments must be passed in as strings'''
+    command = ''
+    command += 'iperf3' # iperf3 command
+    command += ' '
+    command += '--forceflush' # ensures that all data iperf collects is pushed to the txt file
+    command += ' '
+    command += '-c ' + ip_address # sets server ip address
+    command += ' '
+    command += '-p ' + port # sets server port
+    command += ' '
+    command += '-i ' + interval # sets interval to output data to txt file
+    command += ' '
+    command += '-M ' + mtu # sets the minimum transmission unit
+    command += ' '
+    command += '-N' # no delay
+    command += ' '
+    command += '-t ' + length_time_seconds # how long to send data for, in seconds
+    command += ' > '
+    command += file_path + file_output_name + '.txt' # file path and file name of data collected
+    return command
+
+
 def dumbbell_test():
+    duration_one_ms = 0
+    duration_two_ms = 0
+    gap_time = 0
     """ Create and test a dumbbell network.
     """
     topo = DumbbellTopo(delay=21)
@@ -70,9 +102,14 @@ def dumbbell_test():
     sub_processes[h4] = h4.popen('iperf -s -p 2222') # Start server on Receiver #2
 
     # Start client on Source #1
-    sub_processes[h1] = h1.popen('iperf -c {0} -p 1111 -i 1 -M 1460 -N -t 15 > iperf_test_h1-h3_15s.txt'.format(h3_ip), shell=True)
+    command_one = iperf3_command_builder(h3_ip, '1111', '0.5', '1460', str(duration_one_ms),'/school/','output')
+    print(command_one)
+    sub_processes[h1] = h1.popen('iperf --forceflush -c {0} -p 1111 -i 0.5 -M 1460 -N -t 20 > iperf_test_h1-h3_15s.txt'.format(h3_ip), shell=True)
+    print('Source #1 Client Started')
     # Start client on Source #2
-    sub_processes[h2] = h2.popen('iperf -c {0} -p 2222 -i 1 -M 1460 -N -t 15 > iperf_test_h2-h4_15s.txt'.format(h4_ip), shell=True)
+    time.sleep(5)
+    print('Source #2 Client Started')
+    sub_processes[h2] = h2.popen('iperf --forceflush -c {0} -p 2222 -i 0.5 -M 1460 -N -t 15 > iperf_test_h2-h4_15s.txt'.format(h4_ip), shell=True)
 
     sub_processes[h1].wait() # Wait for Source #1 to stop sending
     sub_processes[h2].wait() # Wait for Source #2 to stop sending
@@ -87,10 +124,9 @@ def dumbbell_test():
 
     net.stop()
 
-    
-
-
-
-
 if __name__ == '__main__':
+    clean_result = subprocess.run(['sudo','mn','-c'], stdout=subprocess.PIPE)
     dumbbell_test()
+
+
+
