@@ -105,20 +105,28 @@ def dumbbell_test():
     command_one = iperf3_command_builder(h3_ip, '1111', '0.5', '1460', str(duration_one_ms),'/school/','output')
     print(command_one)
     sub_processes[h1] = h1.popen('iperf --forceflush -c {0} -p 1111 -i 0.5 -M 1460 -N -t 20 > iperf_test_h1-h3_15s.txt'.format(h3_ip), shell=True)
+    cwd_ss_one = h1.popen('watch -n 1 \'ss --tcp -i dst {0} >> host-one-ss-out.txt\''.format(h3_ip), shell=True)
     print('Source #1 Client Started')
     # Start client on Source #2
     time.sleep(5)
     print('Source #2 Client Started')
     sub_processes[h2] = h2.popen('iperf --forceflush -c {0} -p 2222 -i 0.5 -M 1460 -N -t 15 > iperf_test_h2-h4_15s.txt'.format(h4_ip), shell=True)
+    cwd_ss_two = h2.popen('watch -n 1 \'ss --tcp -i dst {0} >> host-two-ss-out.txt\''.format(h4_ip), shell=True)
 
     sub_processes[h1].wait() # Wait for Source #1 to stop sending
     sub_processes[h2].wait() # Wait for Source #2 to stop sending
+
+
 
     sub_processes[h3].terminate() # Stop Receiver #1 server
     sub_processes[h4].terminate() # Stop Receiver #2 server
     sub_processes[h3].wait() # Wait for Receiver #1 server to stop
     sub_processes[h4].wait() # Wait for Receiver #2 server to stop
 
+    cwd_ss_one.terminate()
+    cwd_ss_two.terminate()
+    cwd_ss_one.wait()
+    cwd_ss_two.wait()
 
     #topo.congestion_control_test(net)
 
