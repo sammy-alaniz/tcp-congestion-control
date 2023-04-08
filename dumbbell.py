@@ -89,13 +89,19 @@ class DumbbellTopo(Topo):
 def change_tcp_congestion_algorithm(algo):
     quietRun(f"sysctl -w net.ipv4.tcp_congestion_control={algo}")
 
-def dumbbell_test():
+def dumbbell_test(delay=21, algo='reno'):
+    curr_delay = delay
+    curr_algo = algo
+
+    change_tcp_congestion_algorithm(curr_algo)
+
     duration_one_ms = 0
     duration_two_ms = 0
     gap_time = 0
+
     """ Create and test a dumbbell network.
     """
-    topo = DumbbellTopo(delay=21)
+    topo = DumbbellTopo(curr_delay)
     net = Mininet(topo)
     net.start()
 
@@ -144,7 +150,7 @@ def dumbbell_test():
 
 if __name__ == '__main__':
     clean_result = subprocess.run(['sudo','mn','-c'], stdout=subprocess.PIPE)
-    dumbbell_test()
+    dumbbell_test(21, reno)
 
 
 
