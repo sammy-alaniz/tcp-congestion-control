@@ -13,6 +13,7 @@ from mininet.cli import CLI
 
 import os
 import signal
+import sys
 
 
 class DumbbellTopo(Topo):
@@ -153,6 +154,7 @@ def dumbbell_test(delay=21, algo='reno'):
         net.stop()
     except KeyboardInterrupt:
         quietRun('sudo pkill -9 iperf')
+        sys.exit()
 
 
 if __name__ == '__main__':
