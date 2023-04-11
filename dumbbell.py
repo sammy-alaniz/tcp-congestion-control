@@ -116,19 +116,19 @@ def dumbbell_test(delay=21, algo='reno'):
     h4_ip = h4.IP() # Receiver #2
 
     sub_processes = dict()
-    sub_processes[h3] = h3.popen('nohup iperf -s -p 1111') # Start server on Receiver #1
-    sub_processes[h4] = h4.popen('nohup iperf -s -p 2222') # Start server on Receiver #2
+    sub_processes[h3] = h3.popen('iperf -s -p 1111') # Start server on Receiver #1
+    sub_processes[h4] = h4.popen('iperf -s -p 2222') # Start server on Receiver #2
 
     # Start client on Source #1
 
-    sub_processes[h1] = h1.popen('nohup iperf --forceflush -c {0} -p 1111 -i 1 -f m -N -t 2000 > iperf_test_h1-h3_15s.txt'.format(h3_ip), shell=True)
+    sub_processes[h1] = h1.popen('iperf --forceflush -c {0} -p 1111 -i 1 -f m -N -t 2000 > iperf_test_h1-h3_15s.txt'.format(h3_ip), shell=True)
     cwd_ss_one = h1.popen('watch -n 1 \'ss --tcp -i dst {0} >> host-one-ss-out.txt\''.format(h3_ip), shell=True)
 
     time.sleep(250)
 
     # Start client on Source #2
     print('Source #2 Client Started')
-    sub_processes[h2] = h2.popen('nohup iperf --forceflush -c {0} -p 2222 -i 1 -f m -N -t 1750 > iperf_test_h2-h4_15s.txt'.format(h4_ip), shell=True)
+    sub_processes[h2] = h2.popen('iperf --forceflush -c {0} -p 2222 -i 1 -f m -N -t 1750 > iperf_test_h2-h4_15s.txt'.format(h4_ip), shell=True)
     cwd_ss_two = h2.popen('watch -n 1 \'ss --tcp -i dst {0} >> host-two-ss-out.txt\''.format(h4_ip), shell=True)
 
     sub_processes[h1].wait() # Wait for Source #1 to stop sending
@@ -150,7 +150,7 @@ def dumbbell_test(delay=21, algo='reno'):
 
 if __name__ == '__main__':
     clean_result = subprocess.run(['sudo','mn','-c'], stdout=subprocess.PIPE)
-    dumbbell_test(21, reno)
+    dumbbell_test(21, 'reno')
 
 
 
