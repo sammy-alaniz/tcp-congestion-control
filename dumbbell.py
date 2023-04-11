@@ -90,63 +90,70 @@ def change_tcp_congestion_algorithm(algo):
     quietRun(f"sysctl -w net.ipv4.tcp_congestion_control={algo}")
 
 def dumbbell_test(delay=21, algo='reno'):
-    curr_delay = delay
-    curr_algo = algo
-
-    change_tcp_congestion_algorithm(curr_algo)
-
-    duration_one_ms = 0
-    duration_two_ms = 0
-    gap_time = 0
-
-    """ Create and test a dumbbell network.
-    """
-    topo = DumbbellTopo(curr_delay)
-    net = Mininet(topo)
-    net.start()
-
-    h1 = net.get('h1')
-    h2 = net.get('h2')
-    h3 = net.get('h3')
-    h4 = net.get('h4')
-
-    h1_ip = h1.IP() # Source #1
-    h2_ip = h2.IP() # Source #2
-    h3_ip = h3.IP() # Receiver #1 
-    h4_ip = h4.IP() # Receiver #2
-
     sub_processes = dict()
-    sub_processes[h3] = h3.popen('iperf -s -p 1111') # Start server on Receiver #1
-    sub_processes[h4] = h4.popen('iperf -s -p 2222') # Start server on Receiver #2
 
-    # Start client on Source #1
+    try:
+            
+        curr_delay = delay
+        curr_algo = algo
+    
+        change_tcp_congestion_algorithm(curr_algo)
+    
+        duration_one_ms = 0
+        duration_two_ms = 0
+        gap_time = 0
+    
+        """ Create and test a dumbbell network.
+        """
+        topo = DumbbellTopo(curr_delay)
+        net = Mininet(topo)
+        net.start()
+    
+        h1 = net.get('h1')
+        h2 = net.get('h2')
+        h3 = net.get('h3')
+        h4 = net.get('h4')
+    
+        h1_ip = h1.IP() # Source #1
+        h2_ip = h2.IP() # Source #2
+        h3_ip = h3.IP() # Receiver #1 
+        h4_ip = h4.IP() # Receiver #2
+    
+        
+        sub_processes[h3] = h3.popen('iperf -s -p 1111') # Start server on Receiver #1
+        sub_processes[h4] = h4.popen('iperf -s -p 2222') # Start server on Receiver #2
+    
+        # Start client on Source #1
+    
+        sub_processes[h1] = h1.popen('iperf --forceflush -c {0} -p 1111 -i 1 -f m -N -t 2000 > iperf_test_h1-h3_15s.txt'.format(h3_ip), shell=True)
+        cwd_ss_one = h1.popen('watch -n 1 \'ss --tcp -i dst {0} >> host-one-ss-out.txt\''.format(h3_ip), shell=True)
+    
+        time.sleep(250)
+    
+        # Start client on Source #2
+        print('Source #2 Client Started')
+        sub_processes[h2] = h2.popen('iperf --forceflush -c {0} -p 2222 -i 1 -f m -N -t 1750 > iperf_test_h2-h4_15s.txt'.format(h4_ip), shell=True)
+        cwd_ss_two = h2.popen('watch -n 1 \'ss --tcp -i dst {0} >> host-two-ss-out.txt\''.format(h4_ip), shell=True)
+    
+        sub_processes[h1].wait() # Wait for Source #1 to stop sending
+        sub_processes[h2].wait() # Wait for Source #2 to stop sending
+    
+        sub_processes[h3].terminate() # Stop Receiver #1 server
+        sub_processes[h4].terminate() # Stop Receiver #2 server
+        sub_processes[h3].wait() # Wait for Receiver #1 server to stop
+        sub_processes[h4].wait() # Wait for Receiver #2 server to stop
+    
+        cwd_ss_one.terminate()
+        cwd_ss_two.terminate()
+        cwd_ss_one.wait()
+        cwd_ss_two.wait()
+    
+        #topo.congestion_control_test(net)
+    
+        net.stop()
+    except KeyboardInterrupt:
+        quietRun('sudo pkill -9 iperf')
 
-    sub_processes[h1] = h1.popen('iperf --forceflush -c {0} -p 1111 -i 1 -f m -N -t 2000 > iperf_test_h1-h3_15s.txt'.format(h3_ip), shell=True)
-    cwd_ss_one = h1.popen('watch -n 1 \'ss --tcp -i dst {0} >> host-one-ss-out.txt\''.format(h3_ip), shell=True)
-
-    time.sleep(250)
-
-    # Start client on Source #2
-    print('Source #2 Client Started')
-    sub_processes[h2] = h2.popen('iperf --forceflush -c {0} -p 2222 -i 1 -f m -N -t 1750 > iperf_test_h2-h4_15s.txt'.format(h4_ip), shell=True)
-    cwd_ss_two = h2.popen('watch -n 1 \'ss --tcp -i dst {0} >> host-two-ss-out.txt\''.format(h4_ip), shell=True)
-
-    sub_processes[h1].wait() # Wait for Source #1 to stop sending
-    sub_processes[h2].wait() # Wait for Source #2 to stop sending
-
-    sub_processes[h3].terminate() # Stop Receiver #1 server
-    sub_processes[h4].terminate() # Stop Receiver #2 server
-    sub_processes[h3].wait() # Wait for Receiver #1 server to stop
-    sub_processes[h4].wait() # Wait for Receiver #2 server to stop
-
-    cwd_ss_one.terminate()
-    cwd_ss_two.terminate()
-    cwd_ss_one.wait()
-    cwd_ss_two.wait()
-
-    #topo.congestion_control_test(net)
-
-    net.stop()
 
 if __name__ == '__main__':
     clean_result = subprocess.run(['sudo','mn','-c'], stdout=subprocess.PIPE)
