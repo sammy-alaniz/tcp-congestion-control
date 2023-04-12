@@ -7,6 +7,17 @@ ALGOS = ['reno', 'cubic', 'vegas', 'westwood']
 
 starting_working_dir = os.getcwd()
 
+duration_one = 20
+duration_two = 15
+sleep = 5
+
+test_dir = 'duration-one-' + str(duration_one) + '-duration-two-' + str(duration_two) + '-sleep-' + str(sleep)
+
+starting_working_dir = starting_working_dir + '/' + test_dir
+
+if not os.path.exists(starting_working_dir):
+    os.mkdir(starting_working_dir)
+
 try:
 
     for algo in ALGOS:
@@ -32,7 +43,7 @@ try:
             os.chdir( starting_working_dir + '/' + algo + '/' + delay_dir )
 
             clean_result = subprocess.run(['sudo','mn','-c'], stdout=subprocess.PIPE)
-            dumbbell_test(delay, algo)
+            dumbbell_test(delay, algo, duration_one, duration_two, sleep)
 
 except SystemExit:
     print('\nprogram ended early')
