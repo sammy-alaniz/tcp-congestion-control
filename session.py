@@ -10,15 +10,21 @@ starting_working_dir = os.getcwd()
 try:
 
     for algo in ALGOS:
+        
+        # start at original dir
+        os.chdir( starting_working_dir )
 
         # make algo folder to hold algo specific data
         if not os.path.exists(algo):
             os.mkdir(algo)
 
-        # change directory to the algo directory
-        os.chdir( starting_working_dir + '/' + algo )
+
 
         for delay in DELAYS:
+
+            # change directory to the algo directory
+            os.chdir( starting_working_dir + '/' + algo )
+            
             delay_dir = str(delay) + '_miliseconds'
 
             # make delay folder to hold specific algo/delay data

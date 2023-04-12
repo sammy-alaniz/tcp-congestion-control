@@ -1,0 +1,22 @@
+------------------------------------------------------------
+Client connecting to 10.0.0.4, TCP port 2222
+TCP window size: 85.3 KByte (default)
+------------------------------------------------------------
+[  1] local 10.0.0.2 port 49216 connected with 10.0.0.4 port 2222
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.0000-1.0000 sec   118 MBytes   992 Mbits/sec
+[  1] 1.0000-2.0000 sec   110 MBytes   922 Mbits/sec
+[  1] 2.0000-3.0000 sec   107 MBytes   894 Mbits/sec
+[  1] 3.0000-4.0000 sec   110 MBytes   922 Mbits/sec
+[  1] 4.0000-5.0000 sec   110 MBytes   922 Mbits/sec
+[  1] 5.0000-6.0000 sec   110 MBytes   921 Mbits/sec
+[  1] 6.0000-7.0000 sec   110 MBytes   922 Mbits/sec
+[  1] 7.0000-8.0000 sec   110 MBytes   922 Mbits/sec
+[  1] 8.0000-9.0000 sec   110 MBytes   922 Mbits/sec
+[  1] 9.0000-10.0000 sec   107 MBytes   894 Mbits/sec
+[  1] 10.0000-11.0000 sec   110 MBytes   922 Mbits/sec
+[  1] 11.0000-12.0000 sec   110 MBytes   922 Mbits/sec
+[  1] 12.0000-13.0000 sec   110 MBytes   923 Mbits/sec
+[  1] 13.0000-14.0000 sec   110 MBytes   922 Mbits/sec
+[  1] 14.0000-15.0000 sec   110 MBytes   921 Mbits/sec
+[  1] 0.0000-15.0825 sec  1650 MBytes   918 Mbits/sec
