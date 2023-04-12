@@ -18,13 +18,11 @@ try:
         if not os.path.exists(algo):
             os.mkdir(algo)
 
-
-
         for delay in DELAYS:
 
             # change directory to the algo directory
             os.chdir( starting_working_dir + '/' + algo )
-            
+
             delay_dir = str(delay) + '_miliseconds'
 
             # make delay folder to hold specific algo/delay data
