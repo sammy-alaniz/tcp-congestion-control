@@ -1,7 +1,12 @@
 import re
 import pandas as pd
 import matplotlib.pyplot as plt
+import subprocess
 
+OUTPUT_DIR_PLOTS = './plots'
+DATA_DIR = './duration-one-2000-duration-two-1750-sleep-250'
+ALGO_DIRS = ['reno', 'cubic', 'vegas', 'westwood']
+DELAY_DIRS = ['21_miliseconds', '81_miliseconds', '162_miliseconds']
 
 def parse_iperf_data(file_path : str, start_point : int) -> pd.DataFrame:
     file_data = None
@@ -68,36 +73,42 @@ def merge_df(df_one : pd.DataFrame, df_two : pd.DataFrame) -> pd.DataFrame:
 
 
 if __name__ == '__main__':
-    h1_h3_ss_df = parse_ss_data('host-one-ss-out.txt',0)
-    h1_h3_iperf_df = parse_iperf_data('iperf_test_h1-h3_15s.txt',0)
+    for algo_dir in ALGO_DIRS:
+        for delay_dir in DELAY_DIRS:
+            correct = subprocess.run(['mkdir', '-p', f'{OUTPUT_DIR_PLOTS}/{algo_dir}/{delay_dir}'])
 
-    h2_h4_ss_df = parse_ss_data('host-two-ss-out.txt',250)
-    h2_h4_iperf_df = parse_iperf_data('iperf_test_h2-h4_15s.txt',250)
+            h1_h3_ss_df = parse_ss_data(f'{DATA_DIR}/{algo_dir}/{delay_dir}/host-one-ss-out.txt', 0)
+            h1_h3_iperf_df = parse_iperf_data(f'{DATA_DIR}/{algo_dir}/{delay_dir}/iperf_test_h1-h3_15s.txt', 0)
 
-    h1_h3_ss_iperef_df = merge_df(h1_h3_ss_df, h1_h3_iperf_df)
-    print(h1_h3_ss_iperef_df)
-    h2_h4_ss_iperf_df = merge_df(h2_h4_ss_df, h2_h4_iperf_df)
-    print(h2_h4_ss_iperf_df)
+            h2_h4_ss_df = parse_ss_data(f'{DATA_DIR}/{algo_dir}/{delay_dir}/host-two-ss-out.txt', 0)
+            h2_h4_iperf_df = parse_iperf_data(f'{DATA_DIR}/{algo_dir}/{delay_dir}/iperf_test_h2-h4_15s.txt', 0)
 
-    #h1_h3_ss_iperef_df.plot(x='ID', y='Cwnd', kind='line')
-    #plt.savefig('test.png')
+            h1_h3_ss_iperf_df = merge_df(h1_h3_ss_df, h1_h3_iperf_df)
+            h2_h4_ss_iperf_df = merge_df(h2_h4_ss_df, h2_h4_iperf_df)
 
-    plt.figure(figsize=(8,6))
-    plt.plot(h1_h3_ss_iperef_df['ID'],h1_h3_ss_iperef_df['Cwnd'], label='host 1 to host 3', marker='o', linestyle='-')
-    plt.plot(h2_h4_ss_iperf_df['ID'],h2_h4_ss_iperf_df['Cwnd'], label='host 2 to host 4', marker='x', linestyle='-')
-    plt.xlabel('ID')
-    plt.ylabel('Cwnd')
-    plt.savefig('test2.png')
+            # Since tcp flow 2 starts 250s after flow 1, offset the x axis values
+            offset = len(h1_h3_ss_iperf_df) - len(h2_h4_ss_iperf_df)
+            h2_h4_ss_iperf_df['ID'] = h2_h4_ss_iperf_df['ID'] + offset
 
-    h1_h3_ss_iperef_df = h1_h3_ss_iperef_df.iloc[::20, :]
-    h2_h4_ss_iperf_df = h2_h4_ss_iperf_df.iloc[::20, :]
+            plt.figure(figsize=(8,6))
+            plt.plot(h1_h3_ss_iperf_df['ID'], h1_h3_ss_iperf_df['Cwnd'], label='TCP Flow 1', linestyle='-')
+            plt.plot(h2_h4_ss_iperf_df['ID'], h2_h4_ss_iperf_df['Cwnd'], label='TCP Flow 2', linestyle='-')
+            plt.xlabel('Time')
+            plt.ylabel('Cwnd')
+            plt.legend()
+            plt.savefig(f'{OUTPUT_DIR_PLOTS}/{algo_dir}/{delay_dir}/cwnd_v_time.png')
+            plt.close()
 
-    plt.figure(figsize=(8,6))
-    plt.plot(h1_h3_ss_iperef_df['ID'],h1_h3_ss_iperef_df['Bandwidth_Mbits/sec'], label='host 1 to host 3', marker='o', linestyle='-')
-    plt.plot(h2_h4_ss_iperf_df['ID'],h2_h4_ss_iperf_df['Bandwidth_Mbits/sec'], label='host 2 to host 4', marker='x', linestyle='-')
-    plt.xlabel('ID')
-    plt.ylabel('Bandwidth_Mbits/sec')
-    plt.savefig('test3.png')
+            h1_h3_ss_iperf_df = h1_h3_ss_iperf_df.iloc[::20, :]
+            h2_h4_ss_iperf_df = h2_h4_ss_iperf_df.iloc[::20, :]
 
+            plt.figure(figsize=(8,6))
+            plt.plot(h1_h3_ss_iperf_df['ID'], h1_h3_ss_iperf_df['Bandwidth_Mbits/sec'], label='TCP Flow 1', linestyle='-')
+            plt.plot(h2_h4_ss_iperf_df['ID'], h2_h4_ss_iperf_df['Bandwidth_Mbits/sec'], label='TCP Flow 2', linestyle='-')
+            plt.xlabel('Time')
+            plt.ylabel('Bandwidth_Mbits/sec')
+            plt.legend()
+            plt.savefig(f'{OUTPUT_DIR_PLOTS}/{algo_dir}/{delay_dir}/throughput_v_time.png')
+            plt.close()
 
 
