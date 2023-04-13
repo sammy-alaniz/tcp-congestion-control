@@ -1,0 +1,10 @@
+1. In order to run the mininet toplogy for the different delays and different algorithms, use the Python environment in the mininet VM.
+    - Running 'python session.py' should gather all the data for plotting.
+
+2. To plot the graphs,
+    - First create a new python virtual environment with 'python3 -m venv venv'
+    - Get into the virtual envrionment with 'source venv/bin/activate'
+    - Then install dependencies with 'pip3 install -r plotting_requirements.txt'
+    - Then run 'python3 data-parser.py'
+
+3. All the graphs will be availble in the plots directory.
