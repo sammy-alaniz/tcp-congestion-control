@@ -7,9 +7,9 @@ ALGOS = ['reno', 'cubic', 'vegas', 'westwood']
 
 starting_working_dir = os.getcwd()
 
-duration_one = 2000
-duration_two = 1750
-sleep = 250
+duration_one = 1000
+duration_two = 1000
+sleep = 0
 
 test_dir = 'duration-one-' + str(duration_one) + '-duration-two-' + str(duration_two) + '-sleep-' + str(sleep)
 
