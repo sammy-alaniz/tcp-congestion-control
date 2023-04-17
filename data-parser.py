@@ -3,8 +3,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import subprocess
 
-OUTPUT_DIR_PLOTS = './plots'
-DATA_DIR = './duration-one-2000-duration-two-1750-sleep-250'
+OUTPUT_DIR_PLOTS = './plots-fairness'
+#DATA_DIR = './duration-one-2000-duration-two-1750-sleep-250'
+DATA_DIR = './duration-one-1000-duration-two-1000-sleep-0'
 ALGO_DIRS = ['reno', 'cubic', 'vegas', 'westwood']
 DELAY_DIRS = ['21_miliseconds', '81_miliseconds', '162_miliseconds']
 
@@ -90,8 +91,8 @@ if __name__ == '__main__':
             offset = len(h1_h3_ss_iperf_df) - len(h2_h4_ss_iperf_df)
             h2_h4_ss_iperf_df['ID'] = h2_h4_ss_iperf_df['ID'] + offset
 
-            h1_h3_ss_iperf_df = h1_h3_ss_iperf_df.iloc[::20, :]
-            h2_h4_ss_iperf_df = h2_h4_ss_iperf_df.iloc[::20, :]
+            h1_h3_ss_iperf_df = h1_h3_ss_iperf_df.iloc[::15, :]
+            h2_h4_ss_iperf_df = h2_h4_ss_iperf_df.iloc[::15, :]
 
             line_width = 1
 
