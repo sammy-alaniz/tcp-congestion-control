@@ -90,23 +90,28 @@ if __name__ == '__main__':
             offset = len(h1_h3_ss_iperf_df) - len(h2_h4_ss_iperf_df)
             h2_h4_ss_iperf_df['ID'] = h2_h4_ss_iperf_df['ID'] + offset
 
+            h1_h3_ss_iperf_df = h1_h3_ss_iperf_df.iloc[::20, :]
+            h2_h4_ss_iperf_df = h2_h4_ss_iperf_df.iloc[::20, :]
+
+            line_width = 1
+
             plt.figure(figsize=(8,6))
-            plt.plot(h1_h3_ss_iperf_df['ID'], h1_h3_ss_iperf_df['Cwnd'], label='TCP Flow 1', linestyle='-')
-            plt.plot(h2_h4_ss_iperf_df['ID'], h2_h4_ss_iperf_df['Cwnd'], label='TCP Flow 2', linestyle='-')
-            plt.xlabel('Time')
-            plt.ylabel('Cwnd')
+            plt.plot(h1_h3_ss_iperf_df['ID'], h1_h3_ss_iperf_df['Cwnd'], label='TCP Flow 1', linestyle='-', linewidth=line_width)
+            plt.plot(h2_h4_ss_iperf_df['ID'], h2_h4_ss_iperf_df['Cwnd'], label='TCP Flow 2', linestyle='-', linewidth=line_width)
+            plt.xlabel('Time (seconds)')
+            plt.ylabel('Cwnd (packets)')
             plt.legend()
             plt.savefig(f'{OUTPUT_DIR_PLOTS}/{algo_dir}/{delay_dir}/cwnd_v_time.png')
             plt.close()
 
-            h1_h3_ss_iperf_df = h1_h3_ss_iperf_df.iloc[::20, :]
-            h2_h4_ss_iperf_df = h2_h4_ss_iperf_df.iloc[::20, :]
+            # h1_h3_ss_iperf_df = h1_h3_ss_iperf_df.iloc[::20, :]
+            # h2_h4_ss_iperf_df = h2_h4_ss_iperf_df.iloc[::20, :]
 
             plt.figure(figsize=(8,6))
-            plt.plot(h1_h3_ss_iperf_df['ID'], h1_h3_ss_iperf_df['Bandwidth_Mbits/sec'], label='TCP Flow 1', linestyle='-')
-            plt.plot(h2_h4_ss_iperf_df['ID'], h2_h4_ss_iperf_df['Bandwidth_Mbits/sec'], label='TCP Flow 2', linestyle='-')
-            plt.xlabel('Time')
-            plt.ylabel('Bandwidth_Mbits/sec')
+            plt.plot(h1_h3_ss_iperf_df['ID'], h1_h3_ss_iperf_df['Bandwidth_Mbits/sec'], label='TCP Flow 1', linestyle='-', linewidth=line_width)
+            plt.plot(h2_h4_ss_iperf_df['ID'], h2_h4_ss_iperf_df['Bandwidth_Mbits/sec'], label='TCP Flow 2', linestyle='-', linewidth=line_width)
+            plt.xlabel('Time (seconds)')
+            plt.ylabel('Throughput (Mbps)')
             plt.legend()
             plt.savefig(f'{OUTPUT_DIR_PLOTS}/{algo_dir}/{delay_dir}/throughput_v_time.png')
             plt.close()
