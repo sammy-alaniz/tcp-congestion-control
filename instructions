@@ -8,3 +8,5 @@
     - Then run 'python3 data-parser.py'
 
 3. All the graphs will be availble in the plots directory.
+
+NOTE: The "plots" directory has data for the 2000 second run for congestion window data. The "plots-fairness" directory has data for the throughput data.
